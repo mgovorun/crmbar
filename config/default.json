@@ -1,0 +1,6 @@
+{
+    "host": "http://crm.fsfera.ru:8080",
+    "serialPort": "/dev/tty.usbmodem000000001",
+    "browser": "google chrome"
+}
+
