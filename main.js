@@ -1,6 +1,7 @@
 const {app, Tray, Menu, BrowserWindow, shell, Notification} = require('electron');
 const log = require('electron-log');
 const path = require('path');
+const iconv = require('iconv-lite');
 
 //const config = require('electron-json-config');
 const Store = require('electron-store');
@@ -13,7 +14,7 @@ const store = new Store();
 const startUrl = store.get("host","http://crm.fsfera.ru:8080") + '/set/';
 console.log(startUrl);
 log.info(startUrl);
-let serialPort = store.get("serialPort","/dev/tty.usbmodem000000001");
+let serialPort = store.get("serialPort","COM3");
 console.log(serialPort);
 log.info(serialPort);
 
@@ -37,7 +38,13 @@ function updateTray(ports,selPort) {
     let menu = [];
 
     ports.forEach(p => {
-	menu.push({label: p.path + (p.manufacturer? ' ' + p.manufacturer : ''), type: 'radio', checked: p.path == selPort, click: () => selectPort(p.path)});
+	    let man = '';
+	    if(p.vendorId == '1EAB' ) {
+		    man = ' Barcode scanner';
+//      let buf = Buffer.from(p.manufacturer);
+//	man = ' ' + buf.toString('utf-8');	    
+	    }
+	menu.push({label: p.path + man, type: 'radio', checked: p.path == selPort, click: () => selectPort(p.path)});
     });
     menu.push({ type: 'separator' });
     menu.push({ role: 'quit' });
@@ -88,6 +95,7 @@ function serialStart(serPort) {
 	    url = startUrl + 'select_mdse/?hexbarcode=' + buff.toString('hex');
 	}
 	console.log(url);
+	log.info(url);    
 	shell.openExternal(url);
     });
 
