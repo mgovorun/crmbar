@@ -18,3 +18,7 @@ build_script:
   - npm run dist
 
 test: off
+
+artifacts:
+  - path: crmbar-Setup-*.exe
+    name: crm-Setup
