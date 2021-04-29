@@ -20,5 +20,5 @@ build_script:
 test: off
 
 artifacts:
-  - path: crmbar-Setup-*.exe
-    name: crm-Setup
+  - path: dist\crmbar*Setup*.exe
+  - name: Setup
