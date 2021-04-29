@@ -21,4 +21,4 @@ test: off
 
 artifacts:
   - path: dist\crmbar*Setup*.exe
-  - name: Setup
+    name: Setup
