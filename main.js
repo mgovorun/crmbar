@@ -1,7 +1,6 @@
-const {app, Tray, Menu, BrowserWindow, shell, Notification} = require('electron');
+const {app, Tray, Menu, shell, Notification} = require('electron');
 const log = require('electron-log');
 const path = require('path');
-const iconv = require('iconv-lite');
 
 //const config = require('electron-json-config');
 const Store = require('electron-store');
@@ -17,6 +16,7 @@ log.info(startUrl);
 let serialPort = store.get("serialPort","COM3");
 console.log(serialPort);
 log.info(serialPort);
+const vendors = ['1eab','a108'];
 
 const SerialPort = require('serialport');
 
@@ -38,12 +38,12 @@ function updateTray(ports,selPort) {
     let menu = [];
 
     ports.forEach(p => {
-	    let man = '';
-	    if(p.vendorId == '1EAB' ) {
-		    man = ' Barcode scanner';
-//      let buf = Buffer.from(p.manufacturer);
-//	man = ' ' + buf.toString('utf-8');	    
-	    }
+	let man = '';
+	if(p.vendorId && vendors.indexOf(p.vendorId.toString().toLowerCase()) >= 0 ) {
+	    man = ' Barcode scanner';
+	    //      let buf = Buffer.from(p.manufacturer);
+	    //	man = ' ' + buf.toString('utf-8');	    
+	}
 	menu.push({label: p.path + man, type: 'radio', checked: p.path == selPort, click: () => selectPort(p.path)});
     });
     menu.push({ type: 'separator' });
@@ -56,9 +56,16 @@ function updateTray(ports,selPort) {
 function selectPort(serPort) {
     serialPort = serPort;
     console.log('Changing port to ' + serialPort);
+    log.info('Changing port to ' + serialPort);
     store.set("serialPort", serialPort);    
     if(port && port.isOpen) {
-	port.close();
+	try {
+	    port.close();
+	} catch(error) {
+	    log.error(error);
+	    console.log(error);
+	    console.log("Can't close current port");
+	}
     }
     waitingForSelectedPort();
 }
@@ -68,18 +75,22 @@ function serialStart(serPort) {
 	try {
 	    port = new SerialPort(serPort);
 	} catch(error) {
+	    log.error(error);
 	    console.log(error);
 	    console.log("Can't open port " + serPort);
 	    port = null;
 	}
     } while(!port);
 
-    port.on('data', function (data) {
+    console.log("SerialPort on port " + serPort + " started.");
+    log.info("SerialPort on port " + serPort + " started.");
+//    clearInterval(timerId);
+
+    port.on('data', (data) => {
 
 	const buff = Buffer.from(data);
 	console.log(buff.toString());
 	log.info(buff.toString('utf8'));
-//	log.info(buff.toString('hex'));
 	let first = buff.toString('ascii', 0, 1);
 	let url = '';
 	
@@ -101,14 +112,23 @@ function serialStart(serPort) {
 
     port.on('close',() => {
 	console.log('Port ' + serPort + ' closed');
-	new Notification({title: 'Сканер отключен', body: 'Сканер на порту ' + serPort + ' отключён'}).show()
+	log.info('Port ' + serPort + ' closed');
+	new Notification({title: 'Сканер отключен', body: 'Сканер на порту ' + serPort + ' отключён'}).show();
 	waitingForSelectedPort();
-    });   
+    });
+    
     port.on('open',() => {
 	clearInterval(timerId);
 	console.log('Port ' + serPort + ' opened');
-	new Notification({title: 'Сканер подключен', body: 'Сканер на порту ' + serPort + ' подключён'}).show()
-    });   
+	log.info('Port ' + serPort + ' opened');
+	new Notification({title: 'Сканер подключен', body: 'Сканер на порту ' + serPort + ' подключён'}).show();
+    });
+
+    port.on('error', (err) => {
+	log.error(err);
+	console.log('Error: ', err);
+    });
+
 }
 
 /*
@@ -132,6 +152,7 @@ function waitingForSelectedPort() {
 
 function trySelectedPort() {
     console.log('Trying port ' + serialPort);
+    log.info('Trying port ' + serialPort);
     var foundPort = null;
     ports = [];
     SerialPort.list().then(result => {
@@ -142,12 +163,14 @@ function trySelectedPort() {
 	    if(p.path == serialPort) foundPort = serialPort;
 	});
 
+	updateTray(ports,serialPort);
 	if(foundPort) {
 	    // update Tray
-	    
-	    updateTray(ports,serialPort);
+	    console.log('Port ' + serialPort +' found.');
+	    log.info('Port ' + serialPort +' found.');
 	    serialStart(foundPort);
 	}
+	
     }).
 	catch(err => {
 	    console.log(err);
@@ -161,4 +184,3 @@ app.on('ready', () => {
     waitingForSelectedPort();    
 
 });
-
