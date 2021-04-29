@@ -8,7 +8,7 @@
         "watch": "nodemon --exec electron .",
         "test": "echo \"Error: no test specified\" && exit 1",
         "postinstall": "electron-builder install-app-deps",
-	"dist" : "electron-builder -mw"
+        "dist": "electron-builder -mw"
     },
     "repository": {
         "type": "git",
@@ -22,6 +22,7 @@
     "homepage": "https://github.com/mgovorun/crmbar#readme",
     "devDependencies": {
         "electron": "^11.4.4",
+        "electron-builder": "^22.10.5",
         "nodemon": "^2.0.6"
     },
     "dependencies": {
@@ -30,6 +31,6 @@
         "serialport": "^9.0.7"
     },
     "build": {
-	"buildDependenciesFromSource": true
+        "buildDependenciesFromSource": true
     }
 }
