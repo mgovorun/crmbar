@@ -250,17 +250,18 @@ if (process.env.NODE_ENV !== 'development') {
 
 	dialog.showMessageBox(dialogOpts).then((returnValue) => {
 	    if (returnValue.response === 0) {
+		/*
 		stopSerial = true;
 		if(port && port.isOpen) {
 		    try {
 			port.close();
-			sleep(2000);
 		    } catch(error) {
 			log.error(error);
 			console.log(error);
 			console.log("Can't close current port");
 		    }
-		}		
+		}
+		*/		
 		autoUpdater.quitAndInstall();
 	    }
 	});
