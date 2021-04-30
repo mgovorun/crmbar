@@ -1,6 +1,7 @@
 const {app, Tray, Menu, shell, Notification} = require('electron');
 const log = require('electron-log');
 const path = require('path');
+const SerialPort = require('serialport');
 
 //const config = require('electron-json-config');
 const Store = require('electron-store');
@@ -10,23 +11,48 @@ const store = new Store();
 //console.log(config.file());
 //console.log(config.keys());
 //console.log(config.all());
-const startUrl = store.get("host","http://crm.fsfera.ru:8080") + '/set/';
+let host = store.get("host");
+if(!host) {
+    host = "http://crm.fsfera.ru:8080";
+    store.set("host",host);
+}
+const startUrl = host + '/set/';
+
 console.log(startUrl);
 log.info(startUrl);
-let serialPort = store.get("serialPort","COM3");
-console.log(serialPort);
-log.info(serialPort);
-const vendors = ['1eab','a108'];
-
-const SerialPort = require('serialport');
 
 let ports = [];
 let foundPort = null;
 let port = null;
 let timerId = null;
 
+let serialPort = store.get("serialPort");
+if(!serialPort) {
+    autoDetectPort();
+}
+console.log(serialPort);
+log.info(serialPort);
+const vendors = ['1eab','a108'];
+
 
 let mainWindow, tray;
+
+function autoDetectPort() {
+    SerialPort.list().then(result => {
+	console.log(result);
+	log.info(result);
+	result.forEach(p => {
+	    ports.push(p);
+	    if(p.vendorId && vendors.indexOf(p.vendorId.toString().toLowerCase()) >= 0) {
+		serialPort = p.path;
+		store.set('serialPort',serialPort);
+		let msg = 'Autodetected port ' + serialPort;
+		console.log(msg);
+		log.info(msg);		
+	    }
+	});
+    });
+}
 
 function createTray(ports,selPort) {
     tray = new Tray(path.join(__dirname, './icon/trayTemplate@2x.png'));
@@ -160,6 +186,13 @@ function trySelectedPort() {
 	log.info(result);
 	result.forEach(p => {
 	    ports.push(p);
+	    if(serialPort === undefined && p.vendorId && vendors.indexOf(p.vendorId.toString().toLowerCase()) >= 0) {
+		serialPort = p.path;
+		store.set('serialPort',serialPort);
+		let msg = 'Autodetected port ' + serialPort;
+		console.log(msg);
+		log.info(msg);		
+	    }
 	    if(p.path == serialPort) foundPort = serialPort;
 	});
 
