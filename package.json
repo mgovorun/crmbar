@@ -1,6 +1,6 @@
 {
     "name": "crmbar",
-    "version": "1.0.8",
+    "version": "1.0.9",
     "description": "FS CRM barcode scanning software",
     "main": "main.js",
     "scripts": {
@@ -8,7 +8,8 @@
         "watch": "nodemon --exec electron .",
         "test": "echo \"Error: no test specified\" && exit 1",
         "postinstall": "electron-builder install-app-deps",
-        "dist": "electron-builder -w"
+        "dist": "electron-builder -w -p 'onTagOrDraft'",
+        "release": "electron-builder -m -p 'onTagOrDraft'"
     },
     "repository": {
         "type": "git",
@@ -22,15 +23,19 @@
     "homepage": "https://github.com/mgovorun/crmbar#readme",
     "devDependencies": {
         "electron": "^11.4.4",
-        "electron-builder": "^22.10.5",
+        "electron-builder": "^22.10.4",
         "nodemon": "^2.0.6"
     },
     "dependencies": {
         "electron-log": "^4.3.0",
         "electron-store": "^6.0.1",
+        "electron-updater": "^4.3.8",
         "serialport": "^9.0.7"
     },
     "build": {
-        "buildDependenciesFromSource": true
+        "buildDependenciesFromSource": true,
+        "publish": {
+            "provider": "github"
+        }
     }
 }

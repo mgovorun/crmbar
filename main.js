@@ -1,4 +1,5 @@
-const {app, Tray, Menu, shell, Notification, autoUpdater} = require('electron');
+const {app, Tray, Menu, shell, Notification} = require('electron');
+const {autoUpdater} = require('electron-updater');
 const log = require('electron-log');
 const path = require('path');
 const SerialPort = require('serialport');
@@ -27,8 +28,6 @@ let foundPort = null;
 let port = null;
 let timerId = null;
 
-autoUpdater.logger = log;
-
 let serialPort = store.get("serialPort");
 if(!serialPort) {
     autoDetectPort();
@@ -44,6 +43,7 @@ function autoDetectPort() {
     SerialPort.list().then(result => {
 	console.log(result);
 	log.info(result);
+	ports = [];
 	result.forEach(p => {
 	    ports.push(p);
 	    if(p.vendorId && vendors.indexOf(p.vendorId.toString().toLowerCase()) >= 0) {
@@ -65,6 +65,9 @@ function createTray(ports,selPort) {
 
 function updateTray(ports,selPort) {
     let menu = [];
+
+    menu.push({label: 'Version ' + app.getVersion(), type: 'normal'});
+    menu.push({type: 'separator'});
 
     ports.forEach(p => {
 	let man = '';
@@ -215,16 +218,51 @@ function trySelectedPort() {
     
 }
 
+if (process.env.NODE_ENV !== 'development') {
+    
+    autoUpdater.logger = log;
+    autoUpdater.logger.transports.file.level = "debug";
+
+    setInterval(() => {
+	autoUpdater.checkForUpdates();
+    }, 600000);
+
+    autoUpdater.on('checking-for-update', (event) => {
+	log.info('Checking for update');
+    });
+
+    autoUpdater.on('update-not-available', (event) => {
+	log.info('Update not available');
+    });
+    
+    autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
+	const dialogOpts = {
+	    type: 'info',
+	    buttons: ['Restart', 'Later'],
+	    title: 'Application Update',
+	    message: process.platform === 'win32' ? releaseNotes : releaseName,
+	    detail: 'A new version has been downloaded. Restart the application to apply the updates.'
+	};
+
+	dialog.showMessageBox(dialogOpts).then((returnValue) => {
+	    if (returnValue.response === 0) autoUpdater.quitAndInstall()
+	});
+    });
+
+    autoUpdater.on('error', message => {
+	console.error('There was a problem updating the application');
+	console.error(message);
+    });
+
+}
+
 app.on('ready', () => {
     createTray(ports,serialPort);
-    waitingForSelectedPort();    
-
+    waitingForSelectedPort();
+    if (process.env.NODE_ENV !== 'development') {
+	setTimeout(() => {
+	    autoUpdater.checkForUpdates();
+	}, 3000);
+    }
 });
 
-setTimeout(() => {
-  autoUpdater.checkForUpdates()
-}, 3000);
-
-setInterval(() => {
-  autoUpdater.checkForUpdates()
-}, 60000)
