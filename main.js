@@ -1,7 +1,8 @@
-const {app, Tray, Menu, shell, Notification} = require('electron');
+const {app, Tray, Menu, shell, Notification, autoUpdater} = require('electron');
 const log = require('electron-log');
 const path = require('path');
 const SerialPort = require('serialport');
+//const updater = require('./updater');
 
 //const config = require('electron-json-config');
 const Store = require('electron-store');
@@ -25,6 +26,8 @@ let ports = [];
 let foundPort = null;
 let port = null;
 let timerId = null;
+
+autoUpdater.logger = log;
 
 let serialPort = store.get("serialPort");
 if(!serialPort) {
@@ -56,7 +59,7 @@ function autoDetectPort() {
 
 function createTray(ports,selPort) {
     tray = new Tray(path.join(__dirname, './icon/trayTemplate@2x.png'));
-    tray.setToolTip('crmbar');
+    tray.setToolTip('crmbar ' + app.getVersion());
     updateTray(ports,selPort);
 }
 
@@ -217,3 +220,11 @@ app.on('ready', () => {
     waitingForSelectedPort();    
 
 });
+
+setTimeout(() => {
+  autoUpdater.checkForUpdates()
+}, 3000);
+
+setInterval(() => {
+  autoUpdater.checkForUpdates()
+}, 60000)
