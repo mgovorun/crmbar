@@ -1,4 +1,4 @@
-const {app, Tray, Menu, shell, Notification} = require('electron');
+const {app, Tray, Menu, shell, Notification, dialog} = require('electron');
 const {autoUpdater} = require('electron-updater');
 const log = require('electron-log');
 const path = require('path');
@@ -238,10 +238,10 @@ if (process.env.NODE_ENV !== 'development') {
     autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
 	const dialogOpts = {
 	    type: 'info',
-	    buttons: ['Restart', 'Later'],
-	    title: 'Application Update',
+	    buttons: ['Перезагрузить', 'Позже'],
+	    title: 'Обновления',
 	    message: process.platform === 'win32' ? releaseNotes : releaseName,
-	    detail: 'A new version has been downloaded. Restart the application to apply the updates.'
+	    detail: 'Новая версия загружена. Перезагрузить программу для установки?'
 	};
 
 	dialog.showMessageBox(dialogOpts).then((returnValue) => {
