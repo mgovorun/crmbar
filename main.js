@@ -27,6 +27,7 @@ let ports = [];
 let foundPort = null;
 let port = null;
 let timerId = null;
+let stopSerial = false;
 
 let serialPort = store.get("serialPort");
 if(!serialPort) {
@@ -105,7 +106,7 @@ function selectPort(serPort) {
 function serialStart(serPort) {
     do {
 	try {
-	    port = new SerialPort(serPort);
+	    port = new SerialPort(serPort,{autoOpen: false});
 	} catch(error) {
 	    log.error(error);
 	    console.log(error);
@@ -161,6 +162,7 @@ function serialStart(serPort) {
 	console.log('Error: ', err);
     });
 
+    port.open();
 }
 
 /*
@@ -183,6 +185,8 @@ function waitingForSelectedPort() {
 }
 
 function trySelectedPort() {
+    if(stopSerial) return true;
+    
     console.log('Trying port ' + serialPort);
     log.info('Trying port ' + serialPort);
     var foundPort = null;
@@ -245,7 +249,20 @@ if (process.env.NODE_ENV !== 'development') {
 	};
 
 	dialog.showMessageBox(dialogOpts).then((returnValue) => {
-	    if (returnValue.response === 0) autoUpdater.quitAndInstall()
+	    if (returnValue.response === 0) {
+		stopSerial = true;
+		if(port && port.isOpen) {
+		    try {
+			port.close();
+			sleep(2000);
+		    } catch(error) {
+			log.error(error);
+			console.log(error);
+			console.log("Can't close current port");
+		    }
+		}		
+		autoUpdater.quitAndInstall();
+	    }
 	});
     });
 
@@ -262,7 +279,7 @@ app.on('ready', () => {
     if (process.env.NODE_ENV !== 'development') {
 	setTimeout(() => {
 	    autoUpdater.checkForUpdates();
-	}, 3000);
+	}, 10000);
     }
 });
 
