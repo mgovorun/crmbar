@@ -229,7 +229,7 @@ if (process.env.NODE_ENV !== 'development') {
 
     setInterval(() => {
 	autoUpdater.checkForUpdates();
-    }, 600000);
+    }, 300000);
 
     autoUpdater.on('checking-for-update', (event) => {
 	log.info('Checking for update');
