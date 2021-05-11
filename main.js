@@ -3,6 +3,13 @@ const {autoUpdater} = require('electron-updater');
 const log = require('electron-log');
 const path = require('path');
 const SerialPort = require('serialport');
+/*
+SerialPort.parsers = {
+  Readline: require('@serialport/parser-readline')
+}
+const Readline = SerialPort.parsers.Readline;
+const parser = new Readline();
+*/
 //const updater = require('./updater');
 
 //const config = require('electron-json-config');
@@ -39,6 +46,8 @@ const vendors = ['1eab','a108'];
 
 
 let mainWindow, tray;
+
+let buff = Buffer.from("");
 
 function autoDetectPort() {
     SerialPort.list().then(result => {
@@ -107,6 +116,7 @@ function serialStart(serPort) {
     do {
 	try {
 	    port = new SerialPort(serPort,{autoOpen: false});
+//	    port.pipe(parser);	    
 	} catch(error) {
 	    log.error(error);
 	    console.log(error);
@@ -121,7 +131,7 @@ function serialStart(serPort) {
 
     port.on('data', (data) => {
 
-	const buff = Buffer.from(data);
+	buff = Buffer.concat([buff, Buffer.from(data)]);
 	console.log(buff.toString());
 	log.info(buff.toString('utf8'));
 	let first = buff.toString('ascii', 0, 1);
@@ -133,11 +143,16 @@ function serialStart(serPort) {
 	    url = startUrl + 'gift_cert/?card_id=' + buff.toString().substring(1).trim();
 	} else if(first == 'D') {
 	    url = startUrl + 'order_barcode/?work_id=' + (buff.toString()).substring(1).trim();
-	} else if(buff.length<25) {
-	    url = startUrl + 'select_mdse/?barcode=' + buff.toString();        
+	} else if(buff.length < 25) {
+	    if(buff.length < 13) {
+		return;
+	    } else {
+		url = startUrl + 'select_mdse/?barcode=' + buff.toString();
+	    }
 	} else {
 	    url = startUrl + 'select_mdse/?hexbarcode=' + buff.toString('hex');
 	}
+	buff = Buffer.from("");
 	console.log(url);
 	log.info(url);    
 	shell.openExternal(url);
