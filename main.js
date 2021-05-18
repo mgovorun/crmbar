@@ -135,6 +135,7 @@ function serialStart(serPort) {
 	console.log(buff.toString());
 	log.info(buff.toString('utf8'));
 	let first = buff.toString('ascii', 0, 1);
+	if(first == "\r") buff = buff.slice(1);
 	let url = '';
 	
 	if(first == 'A') {
