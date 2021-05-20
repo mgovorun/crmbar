@@ -135,7 +135,26 @@ function serialStart(serPort) {
 	console.log(buff.toString());
 	log.info(buff.toString('utf8'));
 	let first = buff.toString('ascii', 0, 1);
-	if(first == "\r") buff = buff.slice(1);
+	while(first == "\r" || first == "\n") {
+	    buff = buff.slice(1);
+	    first = buff.toString('ascii', 0, 1);
+	}
+	if(buff.length < 30) {
+
+	    let value = buff.indexOf("\r");
+	    if(value != -1) {
+		buff = buff.subarray(0,value-1);	    
+	    }
+	    value = buff.indexOf("\n");
+	    if(value != -1) {
+		buff = buff.slice(0,value-1);	    
+	    }
+	}
+	
+	log.info("buffer",buff.toString('utf8'));
+	first = buff.toString('ascii', 0, 1);
+	log.info("first",first);
+	
 	let url = '';
 	
 	if(first == 'A') {
@@ -145,11 +164,7 @@ function serialStart(serPort) {
 	} else if(first == 'D') {
 	    url = startUrl + 'order_barcode/?work_id=' + (buff.toString()).substring(1).trim();
 	} else if(buff.length < 25) {
-	    if(buff.length < 13) {
-		return;
-	    } else {
-		url = startUrl + 'select_mdse/?barcode=' + buff.toString();
-	    }
+	    url = startUrl + 'select_mdse/?barcode=' + buff.toString();
 	} else {
 	    url = startUrl + 'select_mdse/?hexbarcode=' + buff.toString('hex');
 	}
