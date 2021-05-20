@@ -132,8 +132,9 @@ function serialStart(serPort) {
     port.on('data', (data) => {
 
 	buff = Buffer.concat([buff, Buffer.from(data)]);
-	console.log(buff.toString());
+	console.log(buff.toString('utf-8'));	
 	log.info(buff.toString('utf8'));
+	log.info('length',buff.length);
 	let first = buff.toString('ascii', 0, 1);
 	while(first == "\r" || first == "\n") {
 	    buff = buff.slice(1);
@@ -143,12 +144,17 @@ function serialStart(serPort) {
 
 	    let value = buff.indexOf("\r");
 	    if(value != -1) {
-		buff = buff.subarray(0,value-1);	    
+		buff = buff.subarray(0,value);	    
 	    }
 	    value = buff.indexOf("\n");
 	    if(value != -1) {
-		buff = buff.slice(0,value-1);	    
+		buff = buff.subarray(0,value);	    
 	    }
+	}
+
+	if(buff.length == 0)  {
+	    buff = Buffer.from("");
+	    return;
 	}
 	
 	log.info("buffer",buff.toString('utf8'));
@@ -164,7 +170,12 @@ function serialStart(serPort) {
 	} else if(first == 'D') {
 	    url = startUrl + 'order_barcode/?work_id=' + (buff.toString()).substring(1).trim();
 	} else if(buff.length < 25) {
-	    url = startUrl + 'select_mdse/?barcode=' + buff.toString();
+	    if(buff.length < 13) {
+		log.info('length < 13 : ',buff.length);
+               return;
+	    } else {		
+		url = startUrl + 'select_mdse/?barcode=' + buff.toString();
+	    }
 	} else {
 	    url = startUrl + 'select_mdse/?hexbarcode=' + buff.toString('hex');
 	}
