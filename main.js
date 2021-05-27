@@ -166,22 +166,24 @@ function serialStart(serPort) {
 	log.info("first",first);
 	
 	let url = '';
+
+	let version = app.getVersion();
 	
 	if(first == 'A') {
-	    url = startUrl + 'selectclient/?card_id=' + buff.toString().substring(1).trim();
+	    url = startUrl + 'selectclient/?crmbar_version=' + version + '&card_id=' + buff.toString().substring(1).trim();
 	} else if(first == 'C') {
-	    url = startUrl + 'gift_cert/?card_id=' + buff.toString().substring(1).trim();
+	    url = startUrl + 'gift_cert/?crmbar_version=' + version + '&card_id=' + buff.toString().substring(1).trim();
 	} else if(first == 'D') {
-	    url = startUrl + 'order_barcode/?work_id=' + (buff.toString()).substring(1).trim();
+	    url = startUrl + 'order_barcode/?crmbar_version=' + version + '&work_id=' + (buff.toString()).substring(1).trim();
 	} else if(buff.length < 25) {
 	    if(buff.length < 12) {
 		log.info('length < 12 : ',buff.length);
                return;
 	    } else {		
-		url = startUrl + 'select_mdse/?barcode=' + buff.toString();
+		url = startUrl + 'select_mdse/?crmbar_version=' + version + '&barcode=' + buff.toString();
 	    }
 	} else {
-	    url = startUrl + 'select_mdse/?hexbarcode=' + buff.toString('hex');
+	    url = startUrl + 'select_mdse/?crmbar_version=' + version + '&hexbarcode=' + buff.toString('hex');
 	}
 	buff = Buffer.from("");
 	console.log(url);
