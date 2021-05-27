@@ -170,8 +170,8 @@ function serialStart(serPort) {
 	} else if(first == 'D') {
 	    url = startUrl + 'order_barcode/?work_id=' + (buff.toString()).substring(1).trim();
 	} else if(buff.length < 25) {
-	    if(buff.length < 13) {
-		log.info('length < 13 : ',buff.length);
+	    if(buff.length < 12) {
+		log.info('length < 12 : ',buff.length);
                return;
 	    } else {		
 		url = startUrl + 'select_mdse/?barcode=' + buff.toString();
