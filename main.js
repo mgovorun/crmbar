@@ -22,7 +22,11 @@ const store = new Store();
 //console.log(config.all());
 let host = store.get("host");
 if(!host) {
-    host = "http://crm.fsfera.ru:8080";
+    host = "https://crm.fsfera.ru";
+    store.set("host",host);
+}
+if(host == "http://crm.fsfera.ru:8080") {
+    host = "https://crm.fsfera.ru";
     store.set("host",host);
 }
 const startUrl = host + '/set/';
