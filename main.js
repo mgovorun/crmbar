@@ -21,11 +21,7 @@ const store = new Store();
 //console.log(config.keys());
 //console.log(config.all());
 let host = store.get("host");
-if(!host) {
-    host = "https://crm.fsfera.ru";
-    store.set("host",host);
-}
-if(host == "http://crm.fsfera.ru:8080") {
+if(!host || host == "http://crm.fsfera.ru:8080") {
     host = "https://crm.fsfera.ru";
     store.set("host",host);
 }
@@ -54,6 +50,8 @@ let mainWindow, tray;
 let buff = Buffer.from("");
 
 function autoDetectPort() {
+//    if(serialPort) serialPort = null;
+//    store.set('serialPort',serialPort);
     SerialPort.list().then(result => {
 	console.log(result);
 	log.info(result);
@@ -61,11 +59,12 @@ function autoDetectPort() {
 	result.forEach(p => {
 	    ports.push(p);
 	    if(p.vendorId && vendors.indexOf(p.vendorId.toString().toLowerCase()) >= 0) {
+		if(serialPort != p.path && port && port.isOpen) port.close();
 		serialPort = p.path;
 		store.set('serialPort',serialPort);
 		let msg = 'Autodetected port ' + serialPort;
 		console.log(msg);
-		log.info(msg);		
+		log.info(msg);
 	    }
 	});
     });
@@ -81,6 +80,8 @@ function updateTray(ports,selPort) {
     let menu = [];
 
     menu.push({label: 'Version ' + app.getVersion(), type: 'normal'});
+    menu.push({type: 'separator'});
+    menu.push({label: 'Автодетект порта', type: 'normal', click: () => autoDetectPort()});
     menu.push({type: 'separator'});
 
     ports.forEach(p => {
@@ -116,21 +117,21 @@ function selectPort(serPort) {
     waitingForSelectedPort();
 }
 
-function serialStart(serPort) {
+function serialStart() {
     do {
 	try {
-	    port = new SerialPort(serPort,{autoOpen: false});
+	    port = new SerialPort(serialPort,{autoOpen: false});
 //	    port.pipe(parser);	    
 	} catch(error) {
 	    log.error(error);
 	    console.log(error);
-	    console.log("Can't open port " + serPort);
+	    console.log("Can't open port " + serialPort);
 	    port = null;
 	}
     } while(!port);
 
-    console.log("SerialPort on port " + serPort + " started.");
-    log.info("SerialPort on port " + serPort + " started.");
+    console.log("SerialPort on port " + serialPort + " started.");
+    log.info("SerialPort on port " + serialPort + " started.");
 //    clearInterval(timerId);
 
     port.on('data', (data) => {
@@ -192,17 +193,17 @@ function serialStart(serPort) {
     });
 
     port.on('close',() => {
-	console.log('Port ' + serPort + ' closed');
-	log.info('Port ' + serPort + ' closed');
-	new Notification({title: 'Сканер отключен', body: 'Сканер на порту ' + serPort + ' отключён'}).show();
+	console.log('Port ' + serialPort + ' closed');
+	log.info('Port ' + serialPort + ' closed');
+	new Notification({title: 'Сканер отключен', body: 'Сканер на порту ' + serialPort + ' отключён'}).show();
 	waitingForSelectedPort();
     });
     
     port.on('open',() => {
 	clearInterval(timerId);
-	console.log('Port ' + serPort + ' opened');
-	log.info('Port ' + serPort + ' opened');
-	new Notification({title: 'Сканер подключен', body: 'Сканер на порту ' + serPort + ' подключён'}).show();
+	console.log('Port ' + serialPort + ' opened');
+	log.info('Port ' + serialPort + ' opened');
+	new Notification({title: 'Сканер подключен', body: 'Сканер на порту ' + serialPort + ' подключён'}).show();
     });
 
     port.on('error', (err) => {
@@ -234,6 +235,7 @@ function waitingForSelectedPort() {
 
 function trySelectedPort() {
     if(stopSerial) return true;
+    if(!serialPort) return true;
     
     console.log('Trying port ' + serialPort);
     log.info('Trying port ' + serialPort);
@@ -259,7 +261,7 @@ function trySelectedPort() {
 	    // update Tray
 	    console.log('Port ' + serialPort +' found.');
 	    log.info('Port ' + serialPort +' found.');
-	    serialStart(foundPort);
+	    serialStart();
 	}
 	
     }).
