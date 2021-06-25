@@ -175,6 +175,10 @@ function serialStart() {
 	} else if(first == 'C') {
 	    url = startUrl + 'gift_cert/?crmbar_version=' + version + '&card_id=' + buff.toString().substring(1).trim();
 	} else if(first == 'D') {
+	    if(buff.length < 6) {
+		log.info('length < 6 : ',buff.length);
+		return;
+	    }
 	    url = startUrl + 'order_barcode/?crmbar_version=' + version + '&work_id=' + (buff.toString()).substring(1).trim();
 	} else if(buff.length < 25) {
 	    if(buff.length < 12) {
