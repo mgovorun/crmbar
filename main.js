@@ -185,9 +185,19 @@ function serialStart() {
 		log.info('length < 12 : ',buff.length);
                return;
 	    } else {		
+		if(buff.toString('ascii', 0, 4) == 'http') {
+		    buff = Buffer.from("");
+		    log.info("Ignoring");
+		    return;
+		}
 		url = startUrl + 'select_mdse/?crmbar_version=' + version + '&barcode=' + buff.toString();
 	    }
 	} else {
+	    if(buff.toString('ascii', 0, 4) == 'http') {
+		buff = Buffer.from("");
+		log.info("Ignoring");
+		return;
+	    }
 	    url = startUrl + 'select_mdse/?crmbar_version=' + version + '&hexbarcode=' + buff.toString('hex');
 	}
 	buff = Buffer.from("");
