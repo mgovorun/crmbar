@@ -186,19 +186,17 @@ function serialStart() {
                return;
 	    } else {		
 		if(buff.toString('ascii', 0, 4) == 'http') {
-		    buff = Buffer.from("");
-		    log.info("Ignoring");
-		    return;
+		    url = startUrl + 'select_mdse/?crmbar_version=' + version + '&wrong_code=' + buff.toString('hex');
+		} else {
+		    url = startUrl + 'select_mdse/?crmbar_version=' + version + '&barcode=' + buff.toString();
 		}
-		url = startUrl + 'select_mdse/?crmbar_version=' + version + '&barcode=' + buff.toString();
 	    }
 	} else {
 	    if(buff.toString('ascii', 0, 4) == 'http') {
-		buff = Buffer.from("");
-		log.info("Ignoring");
-		return;
+		url = startUrl + 'select_mdse/?crmbar_version=' + version + '&wrong_code=' + buff.toString('hex');
+	    } else {
+		url = startUrl + 'select_mdse/?crmbar_version=' + version + '&hexbarcode=' + buff.toString('hex');
 	    }
-	    url = startUrl + 'select_mdse/?crmbar_version=' + version + '&hexbarcode=' + buff.toString('hex');
 	}
 	buff = Buffer.from("");
 	console.log(url);
