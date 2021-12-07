@@ -42,7 +42,7 @@ if(!serialPort) {
 }
 console.log(serialPort);
 log.info(serialPort);
-const vendors = ['1eab','a108'];
+const vendors = ['1eab','a108','28e9','oc2e'];
 
 
 let mainWindow, tray;
