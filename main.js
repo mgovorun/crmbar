@@ -307,7 +307,7 @@ if (process.env.NODE_ENV !== 'development') {
 	    buttons: ['Перезагрузить', 'Позже'],
 	    title: 'Обновления',
 	    message: process.platform === 'win32' ? releaseNotes : releaseName,
-	    detail: 'Новая версия загружена. Перезагрузить программу для установки?'
+	    detail: 'Новая версия CRMBAR загружена. Перезагрузить программу для установки новой версии?'
 	};
 
 	dialog.showMessageBox(dialogOpts).then((returnValue) => {
