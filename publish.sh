@@ -18,6 +18,6 @@ git push
 echo "Waiting 6 minutes for appveyor..."
 sleep 360 
 
-gh release list v$ver | grep crmbar-Setup-$ver.exe 
+gh release list -L 3 
 
-gh release edit v$ver --draft=false
+gh release edit $ver --draft=false
