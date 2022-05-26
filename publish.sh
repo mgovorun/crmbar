@@ -6,7 +6,8 @@ ver=`jq -r '.version' package.json`
 
 echo $ver
 
-vipe | gh release create v$ver -F -d -t $ver
+vipe > /tmp/desc ; gh release create v$ver -F /tmp/desc -t $ver -d
+rm /tmp/desc
 
 CSC_NAME="Govorun Code Signing Certificate 2" GH_TOKEN=`cat private/GH_TOKEN.txt` npm run release
 
@@ -19,4 +20,4 @@ sleep 360
 
 gh release list v$ver | grep crmbar-Setup-$ver.exe 
 
-echo "Don't forget to publish release v$ver"
+gh release edit v$ver --draft=false
