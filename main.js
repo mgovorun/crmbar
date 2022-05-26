@@ -180,6 +180,8 @@ function serialStart() {
 		return;
 	    }
 	    url = startUrl + 'order_barcode/?crmbar_version=' + version + '&work_id=' + (buff.toString()).substring(1).trim();
+	} else if(first == 'F') {
+	    url = startUrl + 'packet_barcode/?crmbar_version=' + version + '&packet_id=' + (buff.toString()).substring(1).trim();
 	} else if(buff.length < 25) {
 	    if(buff.length < 12) {
 		log.info('length < 12 : ',buff.length);
