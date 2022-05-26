@@ -313,6 +313,8 @@ if (process.env.NODE_ENV !== 'development') {
 	};
 
 	dialog.showMessageBox(dialogOpts).then((returnValue) => {
+
+	    
 	    if (returnValue.response === 0) {
 		stopSerial = true;
 		if(port && port.isOpen) {
@@ -324,7 +326,9 @@ if (process.env.NODE_ENV !== 'development') {
 			console.log("Can't close current port");
 		    }
 		}
-		autoUpdater.quitAndInstall();
+		setTimeout(() => {
+		    autoUpdater.quitAndInstall();
+		}, 2000);
 	    }
 	});
     });

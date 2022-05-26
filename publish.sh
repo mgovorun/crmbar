@@ -8,7 +8,7 @@ echo $ver
 
 vipe | gh release create v$ver -F -d -t $ver
 
-GH_TOKEN=`cat private/GH_TOKEN.txt` npm run release
+CSC_NAME="Govorun Code Signing Certificate 2" GH_TOKEN=`cat private/GH_TOKEN.txt` npm run release
 
 git commit -am $ver
 
