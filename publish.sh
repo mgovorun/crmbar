@@ -6,6 +6,8 @@ ver=`jq -r '.version' package.json`
 
 echo $ver
 
+sleep 3
+
 vipe > /tmp/desc ; gh release create v$ver -F /tmp/desc -t $ver -d
 rm /tmp/desc
 
