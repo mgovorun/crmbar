@@ -183,10 +183,10 @@ function serialStart() {
 	    url = startUrl + 'order_barcode/?crmbar_version=' + version + '&work_id=' + (buff.toString()).substring(1).trim();
 	} else if(first == 'F') {
 	    // packet
-	    url = startUrl + 'packet_barcode/?crmbar_version=' + version + '&packet_id=' + (buff.toString()).substring(1).trim();
+	    url = startUrl + 'packet_barcode/?crmbar_version=' + version + '&mode=prod&order_id=' + (buff.toString()).substring(1).trim();
 	} else if(first == 'H') {
 	    // transp packet
-	    url = startUrl + 'packet_barcode/?crmbar_version=' + version + '&transp_packet_id=' + (buff.toString()).substring(1).trim();
+	    url = startUrl + 'packet_barcode/?crmbar_version=' + version + '&mode=manager&order_id=' + (buff.toString()).substring(1).trim();
 	} else if(first == 'G') {
 	    // calendar production
 //	    url = fsapiUrl + 'order/calendar/' + (buff.toString()).substring(1).trim() + '/process';

@@ -17,8 +17,8 @@ git commit -am $ver
 
 git push
 
-echo "Waiting 6 minutes for appveyor..."
-sleep 360 
+echo "Waiting 8 minutes for appveyor..."
+sleep 480 
 
 gh release list -L 2 
 
