@@ -26,6 +26,7 @@ if(!host || host == "http://crm.fsfera.ru:8080") {
     store.set("host",host);
 }
 const startUrl = host + '/set/';
+const fsapiUrl = host + '/fsapi?/';
 
 console.log(startUrl);
 log.info(startUrl);
@@ -181,7 +182,15 @@ function serialStart() {
 	    }
 	    url = startUrl + 'order_barcode/?crmbar_version=' + version + '&work_id=' + (buff.toString()).substring(1).trim();
 	} else if(first == 'F') {
+	    // packet
 	    url = startUrl + 'packet_barcode/?crmbar_version=' + version + '&packet_id=' + (buff.toString()).substring(1).trim();
+	} else if(first == 'H') {
+	    // transp packet
+	    url = startUrl + 'packet_barcode/?crmbar_version=' + version + '&transp_packet_id=' + (buff.toString()).substring(1).trim();
+	} else if(first == 'G') {
+	    // calendar production
+//	    url = fsapiUrl + 'order/calendar/' + (buff.toString()).substring(1).trim() + '/process';
+	    url = startUrl + 'order_barcode/?crmbar_version=' + version + '&calendar=true&work_id=' + (buff.toString()).substring(1).trim();
 	} else if(buff.length < 25) {
 	    if(buff.length < 12) {
 		log.info('length < 12 : ',buff.length);

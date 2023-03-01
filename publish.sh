@@ -20,6 +20,6 @@ git push
 echo "Waiting 6 minutes for appveyor..."
 sleep 360 
 
-gh release list -L 3 
+gh release list -L 2 
 
-gh release edit $ver --draft=false
+gh release edit v$ver --draft=false
