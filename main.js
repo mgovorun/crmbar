@@ -148,7 +148,7 @@ function serialStart() {
 	log.info(buff.toString('utf8'));
 	log.info('length',buff.length);
 	let first = buff.toString('ascii', 0, 1);
-	while(first == "\r" || first == "\n") {
+	while(first == "\r" || first == "\n" || first == "\x01D") {
 	    buff = buff.slice(1);
 	    first = buff.toString('ascii', 0, 1);
 	}
