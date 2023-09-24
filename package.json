@@ -1,6 +1,6 @@
 {
     "name": "crmbar",
-    "version": "1.0.39",
+    "version": "1.0.40",
     "description": "FS CRM barcode scanning software",
     "main": "main.js",
     "scripts": {
