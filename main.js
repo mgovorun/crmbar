@@ -1,8 +1,9 @@
 const {app, Tray, Menu, shell, Notification, dialog} = require('electron');
 const {autoUpdater} = require('electron-updater');
+const { trimBufferStart, trimBufferEnd, trimBuffer } = require('trim-buffer');
 const log = require('electron-log');
 const path = require('path');
-const SerialPort = require('serialport');
+const SerialPort = require('serialport').SerialPort;
 /*
 SerialPort.parsers = {
   Readline: require('@serialport/parser-readline')
@@ -43,7 +44,7 @@ if(!serialPort) {
 }
 console.log(serialPort);
 log.info(serialPort);
-const vendors = ['1eab','a108','28e9','oc2e','0483'];
+const vendors = ['1eab','a108','28e9','oc2e','0483','2dd6'];
 
 
 let mainWindow, tray;
@@ -121,7 +122,11 @@ function selectPort(serPort) {
 function serialStart() {
     do {
 	try {
-	    port = new SerialPort(serialPort,{autoOpen: false});
+	    port = new SerialPort({
+                path: serialPort,
+                baudRate: 9600,
+                autoOpen: false
+            });
 //	    port.pipe(parser);	    
 	} catch(error) {
 	    log.error(error);
@@ -133,16 +138,17 @@ function serialStart() {
 
     console.log("SerialPort on port " + serialPort + " started.");
     log.info("SerialPort on port " + serialPort + " started.");
-//    clearInterval(timerId);
+    clearInterval(timerId);
 
     port.on('data', (data) => {
 
 	buff = Buffer.concat([buff, Buffer.from(data)]);
+        buff = trimBuffer(buff);
 	console.log(buff.toString('utf-8'));	
 	log.info(buff.toString('utf8'));
 	log.info('length',buff.length);
 	let first = buff.toString('ascii', 0, 1);
-	while(first == "\r" || first == "\n") {
+	while(first == "\r" || first == "\n" || first == "\x01D") {
 	    buff = buff.slice(1);
 	    first = buff.toString('ascii', 0, 1);
 	}
@@ -158,6 +164,7 @@ function serialStart() {
 	    }
 	}
 
+        
 	if(buff.length == 0)  {
 	    buff = Buffer.from("");
 	    return;
