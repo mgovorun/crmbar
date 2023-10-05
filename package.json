@@ -1,6 +1,6 @@
 {
     "name": "crmbar",
-    "version": "1.0.43",
+    "version": "1.0.44",
     "description": "FS CRM barcode scanning software",
     "main": "main.js",
     "scripts": {
@@ -30,8 +30,8 @@
         "electron-log": "^4.3.0",
         "electron-store": "^6.0.1",
         "electron-updater": "^4.6.5",
-        "node-gyp": "^8.4.1",
-        "serialport": "^11.0.0",
+        "node-gyp": "^9.4.0",
+        "serialport": "^11.0.1",
         "trim-buffer": "^5.0.0"
     },
     "build": {
