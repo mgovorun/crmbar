@@ -17,8 +17,14 @@ git commit -am $ver
 
 git push
 
-echo "Waiting 8 minutes for appveyor..."
-sleep 480 
+echo "Press any key after Appveyor finished build..."
+while [ true ] ; do
+read -t 3 -n 1
+if [ $? = 0 ] ; then
+exit ;
+else
+fi
+done
 
 gh release list -L 2 
 

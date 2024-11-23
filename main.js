@@ -124,7 +124,11 @@ function serialStart() {
 	try {
 	    port = new SerialPort({
                 path: serialPort,
-                baudRate: 9600,
+                baudRate: 115200,
+                  dataBits: 8,
+                stopBits: 1,
+                Parity: 'none',
+                flowControl: false,
                 autoOpen: false
             });
 //	    port.pipe(parser);	    
